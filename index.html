@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IntelliFlow - AI Workflow Automation Advisory</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0d0d1a;
+            color: #e0e0e0;
+        }
+        /* n8n.io inspired animated gradient background */
+        .gradient-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            z-index: -1;
+            background: radial-gradient(circle at 10% 20%, rgba(138, 43, 226, 0.2), transparent 40%),
+                        radial-gradient(circle at 80% 90%, rgba(25, 25, 112, 0.3), transparent 40%),
+                        radial-gradient(circle at 50% 50%, rgba(20, 20, 40, 0.5), #0d0d1a 70%);
+            animation: move-glow 20s ease-in-out infinite alternate;
+        }
+
+        @keyframes move-glow {
+            from {
+                transform: scale(1) translate(0, 0);
+            }
+            to {
+                transform: scale(1.2) translate(20px, -20px);
+            }
+        }
+        
+        /* Custom card styles with glowing border effect */
+        .sector-card {
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .sector-card:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(120deg, transparent, rgba(138, 43, 226, 0.3), transparent);
+            transition: left 0.5s ease;
+        }
+        .sector-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 10px 30px rgba(138, 43, 226, 0.1);
+        }
+        .sector-card:hover:before {
+            left: 100%;
+        }
+
+        /* Active tab style */
+        .tab-active {
+            background-color: #4a044e; /* A shade of purple */
+            color: white;
+            border-color: #9333ea;
+        }
+
+        /* On-scroll animations */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0d0d1a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #4a044e;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #9333ea;
+        }
+        
+        /* Chat UI styles */
+        .chat-message {
+            max-width: 80%;
+        }
+        
+        /* Tailwind CSS prose overrides for better visuals */
+        .prose strong {
+            color: #c084fc; /* purple-300 */
+        }
+        .prose ul {
+            list-style: none;
+            padding-left: 0;
+        }
+        .prose li {
+            position: relative;
+            padding-left: 1.5em;
+        }
+        .prose li::before {
+            content: '•';
+            position: absolute;
+            left: 0;
+            color: #9333ea; /* purple-600 */
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body class="overflow-x-hidden">
+    <div class="gradient-bg"></div>
+
+    <!-- Header / Navigation -->
+    <header class="fixed top-0 left-0 w-full bg-black/30 backdrop-blur-sm z-50 border-b border-white/10">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="#" class="text-2xl font-bold text-white">Intelli<span class="text-purple-400">Flow</span></a>
+            <nav class="hidden md:flex items-center space-x-8">
+                <a href="#about" class="text-gray-300 hover:text-purple-400 transition-colors">About Us</a>
+                <a href="#how-it-works" class="text-gray-300 hover:text-purple-400 transition-colors">How It Works</a>
+                <a href="#contact" class="text-gray-300 hover:text-purple-400 transition-colors">Contact</a>
+            </nav>
+            <a href="#home" class="hidden md:inline-block bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2 px-5 rounded-lg transition-transform hover:scale-105">Get Started</a>
+            <button id="mobile-menu-btn" class="md:hidden text-white">
+                <i data-lucide="menu"></i>
+            </button>
+        </div>
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden px-6 pb-4">
+             <a href="#about" class="block py-2 text-gray-300 hover:text-purple-400">About Us</a>
+             <a href="#how-it-works" class="block py-2 text-gray-300 hover:text-purple-400">How It Works</a>
+             <a href="#contact" class="block py-2 text-gray-300 hover:text-purple-400">Contact</a>
+             <a href="#home" class="block mt-2 bg-purple-600 hover:bg-purple-700 text-white text-center font-semibold py-2 px-5 rounded-lg">Get Started</a>
+        </div>
+    </header>
+
+    <main class="relative z-10">
+        <!-- Home / Hero Section -->
+        <section id="home" class="min-h-screen flex items-center pt-20">
+            <div class="container mx-auto px-6 text-center">
+                <div class="max-w-3xl mx-auto">
+                    <h1 class="text-4xl md:text-6xl font-black text-white leading-tight reveal">
+                        Unlock Your Workflow's <span class="text-purple-400">Full Potential</span> with AI
+                    </h1>
+                    <p class="mt-6 text-lg text-gray-300 max-w-2xl mx-auto reveal" style="transition-delay: 200ms;">
+                        We analyze your operations and provide actionable insights to automate and augment your workflows. Stop guessing, start optimizing.
+                    </p>
+                </div>
+
+                <!-- Sector Selection -->
+                <div id="sector-selection" class="mt-12 reveal" style="transition-delay: 400ms;">
+                    <h2 class="text-2xl font-bold text-white mb-8">Select Your Industry to Begin</h2>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 max-w-5xl mx-auto">
+                        <!-- Sector Cards will be injected here by JS -->
+                    </div>
+                </div>
+
+                <!-- User Interaction Section (Initially Hidden) -->
+                <div id="interaction-section" class="hidden mt-12 max-w-4xl mx-auto text-left">
+                    <div class="flex justify-between items-center mb-8">
+                        <div>
+                            <button id="back-to-sectors" class="flex items-center text-purple-400 hover:text-purple-300 transition-colors">
+                                <i data-lucide="arrow-left" class="mr-2"></i> Back to Industries
+                            </button>
+                            <h2 class="text-3xl font-bold text-white">Analyze Your <span id="selected-sector-title" class="text-purple-400"></span> Workflow</h2>
+                            <p class="text-gray-400 mt-1">Provide your details using one of the methods below.</p>
+                        </div>
+                    </div>
+
+                    <!-- Tabs -->
+                    <div class="flex justify-center space-x-2 md:space-x-4 border-b border-white/10 mb-8">
+                        <button class="tab-btn tab-active flex-1 md:flex-initial flex items-center justify-center gap-2 py-3 px-6 border-b-2 border-transparent text-gray-300 hover:bg-white/5 transition" data-tab="form">
+                            <i data-lucide="file-text"></i> <span class="hidden md:inline">Fill Form</span>
+                        </button>
+                        <button class="tab-btn flex-1 md:flex-initial flex items-center justify-center gap-2 py-3 px-6 border-b-2 border-transparent text-gray-300 hover:bg-white/5 transition" data-tab="upload">
+                            <i data-lucide="upload-cloud"></i> <span class="hidden md:inline">Upload Docs</span>
+                        </button>
+                        <button class="tab-btn flex-1 md:flex-initial flex items-center justify-center gap-2 py-3 px-6 border-b-2 border-transparent text-gray-300 hover:bg-white/5 transition" data-tab="chat">
+                            <i data-lucide="message-square"></i> <span class="hidden md:inline">Start Chat</span>
+                        </button>
+                    </div>
+
+                    <!-- Tab Content -->
+                    <div class="bg-black/20 p-8 rounded-lg border border-white/10">
+                        <!-- Form Content -->
+                        <div id="form-content" class="tab-content">
+                            <form class="space-y-6">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <input type="text" placeholder="Company Name" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-purple-500">
+                                    <input type="email" placeholder="Work Email" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-purple-500">
+                                </div>
+                                <textarea placeholder="Describe your current workflow challenges..." rows="5" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-purple-500"></textarea>
+                                <button type="button" class="submit-btn w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-6 rounded-lg transition-transform hover:scale-105 flex items-center justify-center gap-2">✨ Get AI Suggestions</button>
+                            </form>
+                        </div>
+
+                        <!-- Upload Content -->
+                        <div id="upload-content" class="tab-content hidden">
+                           <div class="text-center">
+                               <label for="file-upload" class="cursor-pointer">
+                                   <div class="border-2 border-dashed border-gray-600 rounded-lg p-12 hover:border-purple-500 transition-colors">
+                                       <i data-lucide="file-up" class="mx-auto h-16 w-16 text-gray-500"></i>
+                                       <p class="mt-4 text-lg">Click to upload or drag and drop</p>
+                                       <p class="text-sm text-gray-500">SOPs, Policies, or other workflow documents (PDF, DOCX)</p>
+                                   </div>
+                               </label>
+                               <input id="file-upload" type="file" class="hidden" multiple>
+                               <div id="file-list" class="mt-4 text-left"></div>
+                               <button type="button" class="submit-btn mt-6 w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-6 rounded-lg transition-transform hover:scale-105 disabled:bg-gray-600 disabled:cursor-not-allowed flex items-center justify-center gap-2" disabled>✨ Get AI Suggestions</button>
+                           </div>
+                        </div>
+
+                        <!-- Chat Content -->
+                        <div id="chat-content" class="tab-content hidden">
+                            <div class="h-80 bg-gray-900/50 rounded-lg p-4 flex flex-col space-y-4 overflow-y-auto" id="chat-window">
+                                <!-- Chat messages injected here -->
+                            </div>
+                            <div class="mt-4 flex gap-4">
+                                <input type="text" id="chat-input" placeholder="Type your message..." class="flex-grow bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-purple-500">
+                                <button id="send-chat" class="bg-purple-600 hover:bg-purple-700 text-white font-bold p-3 rounded-lg transition-transform hover:scale-105">
+                                    <i data-lucide="send"></i>
+                                </button>
+                            </div>
+                             <button type="button" class="submit-btn mt-4 w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-6 rounded-lg transition-transform hover:scale-105 flex items-center justify-center gap-2">✨ Get AI Suggestions from Chat</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- About Us Section -->
+        <section id="about" class="py-20">
+            <div class="container mx-auto px-6">
+                <div class="grid md:grid-cols-2 gap-12 items-center">
+                    <div class="reveal">
+                        <h2 class="text-3xl md:text-4xl font-bold text-white">About <span class="text-purple-400">IntelliFlow</span></h2>
+                        <p class="mt-4 text-gray-300">We are a team of expert consultants and AI specialists passionate about business process optimization. We believe that the right technology can transform any business, making it more efficient, productive, and innovative.</p>
+                        <p class="mt-4 text-gray-300">Our mission is not to replace human expertise, but to augment it. We provide the strategic advice you need to integrate AI-powered automation seamlessly into your existing workflows, empowering your team to focus on what truly matters.</p>
+                    </div>
+                    <div class="reveal" style="transition-delay: 200ms;">
+                        <img src="https://placehold.co/600x400/1a1a2e/4a044e?text=Our+Team" alt="Our Team" class="rounded-lg shadow-2xl shadow-purple-900/20">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- How It Works Section -->
+        <section id="how-it-works" class="py-20 bg-black/20">
+            <div class="container mx-auto px-6 text-center">
+                <h2 class="text-3xl md:text-4xl font-bold text-white reveal">Our Advisory Process</h2>
+                <p class="mt-4 max-w-2xl mx-auto text-gray-300 reveal" style="transition-delay: 200ms;">A clear, structured approach to workflow optimization.</p>
+                <div class="mt-12 grid md:grid-cols-3 gap-8 relative">
+                    <!-- Dashed line connecting the steps -->
+                    <div class="hidden md:block absolute top-1/2 left-0 w-full h-px -translate-y-12 bg-repeat-x" style="background-image: linear-gradient(to right, #4a044e 50%, transparent 50%); background-size: 20px 1px;"></div>
+                    
+                    <div class="relative reveal">
+                        <div class="bg-gray-800/50 p-6 rounded-lg border border-white/10 text-center">
+                            <div class="mb-4 inline-block bg-purple-600 text-white p-4 rounded-full">
+                                <i data-lucide="database-zap"></i>
+                            </div>
+                            <h3 class="text-xl font-bold text-white">1. Submit Details</h3>
+                            <p class="mt-2 text-gray-400">You provide information about your workflow through our secure form, document upload, or chat interface.</p>
+                        </div>
+                    </div>
+                    <div class="relative reveal" style="transition-delay: 200ms;">
+                        <div class="bg-gray-800/50 p-6 rounded-lg border border-white/10 text-center">
+                            <div class="mb-4 inline-block bg-purple-600 text-white p-4 rounded-full">
+                                <i data-lucide="brain-circuit"></i>
+                            </div>
+                            <h3 class="text-xl font-bold text-white">2. AI-Powered Analysis</h3>
+                            <p class="mt-2 text-gray-400">Our system analyzes your submitted data to identify key areas for automation and augmentation.</p>
+                        </div>
+                    </div>
+                    <div class="relative reveal" style="transition-delay: 400ms;">
+                        <div class="bg-gray-800/50 p-6 rounded-lg border border-white/10 text-center">
+                            <div class="mb-4 inline-block bg-purple-600 text-white p-4 rounded-full">
+                                <i data-lucide="clipboard-list"></i>
+                            </div>
+                            <h3 class="text-xl font-bold text-white">3. Get Your Quote</h3>
+                            <p class="mt-2 text-gray-400">Our expert team reviews the AI suggestions and provides you with a detailed advisory quote.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Contact Us Section -->
+        <section id="contact" class="py-20">
+            <div class="container mx-auto px-6 text-center">
+                 <h2 class="text-3xl md:text-4xl font-bold text-white reveal">Get in Touch</h2>
+                 <p class="mt-4 max-w-2xl mx-auto text-gray-300 reveal" style="transition-delay: 200ms;">Have questions? We're here to help you on your automation journey.</p>
+                 <div class="max-w-xl mx-auto mt-12 text-left reveal" style="transition-delay: 400ms;">
+                     <form class="space-y-6 bg-black/20 p-8 rounded-lg border border-white/10">
+                        <input type="text" placeholder="Your Name" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-purple-500">
+                        <input type="email" placeholder="Your Email" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-purple-500">
+                        <textarea placeholder="Your Message" rows="5" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-purple-500"></textarea>
+                        <button type="button" class="submit-btn w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-6 rounded-lg transition-transform hover:scale-105">Send Message</button>
+                    </form>
+                 </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-black/30 border-t border-white/10 py-8">
+        <div class="container mx-auto px-6 text-center text-gray-400">
+            <p>&copy; 2025 IntelliFlow. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Contact Success Modal -->
+    <div id="contact-success-modal" class="fixed inset-0 bg-black/80 flex items-center justify-center z-[60] hidden">
+        <div class="bg-gray-900 border border-purple-500 rounded-lg p-8 max-w-sm mx-4 text-center transform scale-90 opacity-0 transition-all duration-300">
+            <div class="mx-auto bg-green-500/20 text-green-400 h-16 w-16 flex items-center justify-center rounded-full">
+                <i data-lucide="check-circle-2" class="h-10 w-10"></i>
+            </div>
+            <h3 class="text-2xl font-bold text-white mt-6">Message Sent!</h3>
+            <p class="text-gray-300 mt-2">Thank you for reaching out. We will get back to you shortly.</p>
+            <button id="close-contact-modal" class="mt-6 w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-6 rounded-lg">Close</button>
+        </div>
+    </div>
+    
+    <!-- AI Suggestion Modal -->
+    <div id="suggestion-modal" class="fixed inset-0 bg-black/80 flex items-center justify-center z-[60] hidden">
+        <div class="bg-gray-900 border border-purple-500 rounded-lg p-8 max-w-2xl w-full mx-4 text-left transform scale-90 opacity-0 transition-all duration-300">
+            <!-- Loading State -->
+            <div id="modal-loading-state">
+                <div class="flex items-center justify-center flex-col text-center">
+                    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-400 mx-auto"></div>
+                    <h3 class="text-2xl font-bold text-white mt-6">✨ Analyzing Your Workflow...</h3>
+                    <p class="text-gray-300 mt-2">Our AI is processing your information to generate optimization suggestions. This might take a moment.</p>
+                </div>
+            </div>
+            
+            <!-- Result State -->
+            <div id="modal-result-state" class="hidden">
+                <div class="flex items-start gap-4">
+                    <div class="flex-shrink-0 bg-purple-500/20 text-purple-400 h-12 w-12 flex items-center justify-center rounded-full">
+                        <i data-lucide="brain-circuit" class="h-8 w-8"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl font-bold text-white">Your AI-Powered Suggestions</h3>
+                        <p class="text-gray-400 mt-1">Here are potential areas for automation and augmentation in your workflow.</p>
+                    </div>
+                </div>
+                <div id="suggestion-content" class="prose mt-6 bg-black/30 p-4 rounded-lg max-h-[50vh] overflow-y-auto">
+                    <!-- AI suggestions will be injected here -->
+                </div>
+                <p class="text-xs text-gray-500 mt-4">Note: These suggestions are AI-generated and for advisory purposes. Our team will provide a detailed quote based on these insights.</p>
+                <button id="close-suggestion-modal" class="mt-6 w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-6 rounded-lg">Close</button>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+
+            // --- Gemini API Logic ---
+            const callGeminiAPI = async (prompt, withRetry = true, delay = 1000) => {
+                const apiKey = ""; // API Key is provided by the execution environment
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+
+                const payload = {
+                    contents: [{ parts: [{ text: prompt }] }],
+                };
+
+                try {
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!response.ok) {
+                        if (response.status === 429 && withRetry) { // Throttling
+                            console.warn(`Throttled. Retrying in ${delay / 1000}s...`);
+                            await new Promise(resolve => setTimeout(resolve, delay));
+                            return callGeminiAPI(prompt, true, delay * 2); // Exponential backoff
+                        }
+                        throw new Error(`API call failed with status: ${response.status}`);
+                    }
+
+                    const result = await response.json();
+                    const candidate = result.candidates?.[0];
+
+                    if (candidate && candidate.content?.parts?.[0]?.text) {
+                        return candidate.content.parts[0].text;
+                    } else {
+                        console.error("Unexpected API response structure:", result);
+                        return "Sorry, I couldn't generate a response. The AI model returned an unexpected result.";
+                    }
+                } catch (error) {
+                    console.error("Error calling Gemini API:", error);
+                    return "An error occurred while contacting the AI. Please check the console for details.";
+                }
+            };
+            
+            // --- Data for Sectors ---
+            const sectors = [
+                { name: 'Healthcare', icon: 'heart-pulse' },
+                { name: 'Education', icon: 'school' },
+                { name: 'Restaurants', icon: 'utensils-crossed' },
+                { name: 'Offices', icon: 'briefcase' },
+                { name: 'E-commerce', icon: 'shopping-cart' },
+                { name: 'Manufacturing', icon: 'factory' },
+                { name: 'Logistics', icon: 'truck' },
+                { name: 'Finance', icon: 'landmark' },
+            ];
+
+            const sectorContainer = document.querySelector('#sector-selection .grid');
+            sectors.forEach(sector => {
+                const card = document.createElement('div');
+                card.className = 'sector-card bg-gray-800/50 p-6 rounded-lg cursor-pointer text-center';
+                card.innerHTML = `
+                    <i data-lucide="${sector.icon}" class="mx-auto h-12 w-12 text-purple-400"></i>
+                    <h3 class="mt-4 text-xl font-bold text-white">${sector.name}</h3>
+                `;
+                card.addEventListener('click', () => selectSector(sector.name));
+                sectorContainer.appendChild(card);
+            });
+            lucide.createIcons(); // Re-run to render icons in cards
+
+            // --- UI Elements ---
+            const sectorSelectionDiv = document.getElementById('sector-selection');
+            const interactionSectionDiv = document.getElementById('interaction-section');
+            const selectedSectorTitle = document.getElementById('selected-sector-title');
+            const backToSectorsBtn = document.getElementById('back-to-sectors');
+            
+            const tabs = document.querySelectorAll('.tab-btn');
+            const tabContents = document.querySelectorAll('.tab-content');
+            
+            // --- Sector Selection Logic ---
+            function selectSector(sectorName) {
+                selectedSectorTitle.textContent = sectorName;
+                sectorSelectionDiv.classList.add('hidden');
+                interactionSectionDiv.classList.remove('hidden');
+                window.scrollTo({ top: interactionSectionDiv.offsetTop - 100, behavior: 'smooth' });
+            }
+
+            backToSectorsBtn.addEventListener('click', () => {
+                sectorSelectionDiv.classList.remove('hidden');
+                interactionSectionDiv.classList.add('hidden');
+            });
+            
+            // --- Tab Switching Logic ---
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    tabs.forEach(t => t.classList.remove('tab-active'));
+                    tab.classList.add('tab-active');
+
+                    const target = tab.getAttribute('data-tab');
+                    tabContents.forEach(content => {
+                        content.id === `${target}-content` ? content.classList.remove('hidden') : content.classList.add('hidden');
+                    });
+                });
+            });
+
+            // --- Contact Modal Logic ---
+            const contactSuccessModal = document.getElementById('contact-success-modal');
+            const closeContactModalBtn = document.getElementById('close-contact-modal');
+            const contactSubmitBtn = document.querySelector('#contact .submit-btn');
+
+            const showContactModal = () => {
+                contactSuccessModal.classList.remove('hidden');
+                setTimeout(() => contactSuccessModal.querySelector('div').classList.remove('scale-90', 'opacity-0'), 10);
+            };
+            const hideContactModal = () => {
+                contactSuccessModal.querySelector('div').classList.add('scale-90', 'opacity-0');
+                setTimeout(() => contactSuccessModal.classList.add('hidden'), 300);
+            };
+
+            contactSubmitBtn.addEventListener('click', (e) => { e.preventDefault(); showContactModal(); });
+            closeContactModalBtn.addEventListener('click', hideContactModal);
+            contactSuccessModal.addEventListener('click', (e) => { if (e.target === contactSuccessModal) hideContactModal(); });
+
+            // --- AI Suggestion Modal & Submission Logic ---
+            const suggestionModal = document.getElementById('suggestion-modal');
+            const modalLoadingState = document.getElementById('modal-loading-state');
+            const modalResultState = document.getElementById('modal-result-state');
+            const suggestionContent = document.getElementById('suggestion-content');
+            const closeSuggestionModalBtn = document.getElementById('close-suggestion-modal');
+            const submitBtns = document.querySelectorAll('.submit-btn');
+
+            const showSuggestionModal = (loading = true) => {
+                if (loading) {
+                    modalLoadingState.classList.remove('hidden');
+                    modalResultState.classList.add('hidden');
+                } else {
+                    modalLoadingState.classList.add('hidden');
+                    modalResultState.classList.remove('hidden');
+                }
+                suggestionModal.classList.remove('hidden');
+                setTimeout(() => suggestionModal.querySelector('div').classList.remove('scale-90', 'opacity-0'), 10);
+            };
+            const hideSuggestionModal = () => {
+                suggestionModal.querySelector('div').classList.add('scale-90', 'opacity-0');
+                setTimeout(() => suggestionModal.classList.add('hidden'), 300);
+            };
+
+            submitBtns.forEach(btn => {
+                if (document.querySelector('#contact form').contains(btn)) return; // Exclude contact form button
+
+                btn.addEventListener('click', async () => {
+                    showSuggestionModal(true);
+                    let userInput = '';
+                    const sector = selectedSectorTitle.textContent;
+                    const activeTab = document.querySelector('.tab-btn.tab-active').dataset.tab;
+
+                    if (activeTab === 'form') {
+                        const company = document.querySelector('#form-content input[type="text"]').value;
+                        const challenges = document.querySelector('#form-content textarea').value;
+                        userInput = `Company: ${company || 'Not provided'}\nChallenges: ${challenges || 'Not specified'}`;
+                    } else if (activeTab === 'upload') {
+                        const fileNames = Array.from(fileUpload.files).map(f => f.name).join(', ');
+                        userInput = `The user uploaded the following documents for analysis: ${fileNames}. The documents likely describe their standard operating procedures. Assume they face common challenges in their industry.`;
+                    } else if (activeTab === 'chat') {
+                        const messages = chatHistory.map(m => `${m.role === 'user' ? 'User' : 'Assistant'}: ${m.parts[0].text}`).join('\n');
+                        userInput = `Here is a conversation with a user:\n${messages}`;
+                    }
+                    
+                    const prompt = `You are an expert workflow automation consultant. A potential client from the "${sector}" industry has provided the following information:\n---\n${userInput}\n---\nBased ONLY on this information, analyze their situation and suggest 3-5 specific, actionable parts of their workflow that could be automated or augmented with AI. For each suggestion:\n1. Give it a clear, bolded title.\n2. Provide a brief, one-sentence explanation of the problem it solves.\n3. Use bullet points starting with a hyphen (-) to list 2-3 potential benefits (e.g., "Reduces manual data entry", "Improves customer response time").\nFormat your response in Markdown. Do not add any introductory or concluding paragraphs.`;
+                    
+                    const suggestions = await callGeminiAPI(prompt);
+                    const formattedSuggestions = suggestions
+                        .replace(/\*\*(.*?)\*\*/g, '<h3><strong>$1</strong></h3>')
+                        .replace(/(\r\n|\n|\r)/g, '<br>')
+                        .replace(/<br>\s*-\s/g, '<ul><li>')
+                        .replace(/(<\/li>)<br>\s*-\s/g, '</li><li>')
+                        .replace(/(<li>.*?)<\/li>/g, '$1</li></ul>');
+
+                    suggestionContent.innerHTML = formattedSuggestions;
+                    showSuggestionModal(false);
+                });
+            });
+            
+            closeSuggestionModalBtn.addEventListener('click', hideSuggestionModal);
+            suggestionModal.addEventListener('click', (e) => { if (e.target === suggestionModal) hideSuggestionModal(); });
+
+            // --- File Upload Logic ---
+            const fileUpload = document.getElementById('file-upload');
+            const fileList = document.getElementById('file-list');
+            const uploadSubmitBtn = document.querySelector('#upload-content button.submit-btn');
+
+            fileUpload.addEventListener('change', (e) => {
+                fileList.innerHTML = '';
+                if (fileUpload.files.length > 0) {
+                    uploadSubmitBtn.disabled = false;
+                    Array.from(fileUpload.files).forEach(file => {
+                        const fileItem = document.createElement('div');
+                        fileItem.className = 'flex items-center justify-between bg-gray-800 p-2 rounded-md mt-2';
+                        fileItem.innerHTML = `<span class="text-sm truncate">${file.name}</span><span class="text-xs text-gray-500">${(file.size / 1024).toFixed(1)} KB</span>`;
+                        fileList.appendChild(fileItem);
+                    });
+                } else {
+                    uploadSubmitBtn.disabled = true;
+                }
+            });
+
+            // --- Live Chat Logic ---
+            const chatWindow = document.getElementById('chat-window');
+            const chatInput = document.getElementById('chat-input');
+            const sendChatBtn = document.getElementById('send-chat');
+
+            let chatHistory = [{ role: "model", parts: [{ text: "Hello! I'm your AI assistant. To start, please tell me about your company and the workflow you'd like to improve." }] }];
+
+            const addChatMessage = (message, sender) => {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `chat-message ${sender === 'user' ? 'self-end' : 'self-start'}`;
+                messageDiv.innerHTML = `<div class="${sender === 'user' ? 'bg-purple-600' : 'bg-gray-700'} p-3 rounded-lg ${sender === 'user' ? 'rounded-br-none' : 'rounded-bl-none'}"><p class="text-sm">${message}</p></div>`;
+                chatWindow.appendChild(messageDiv);
+                chatWindow.scrollTop = chatWindow.scrollHeight;
+            }
+            addChatMessage(chatHistory[0].parts[0].text, 'bot'); // Display initial message
+
+            const handleSendChat = async () => {
+                const message = chatInput.value.trim();
+                if (!message || sendChatBtn.disabled) return;
+                
+                addChatMessage(message, 'user');
+                chatHistory.push({ role: "user", parts: [{ text: message }] });
+                chatInput.value = '';
+                sendChatBtn.disabled = true;
+                sendChatBtn.innerHTML = `<div class="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>`;
+
+                const prompt = `You are a friendly AI assistant for IntelliFlow, a workflow automation advisory company. A user is chatting to describe their workflow issues. Your goal is to understand their problem by asking clarifying questions. Keep your responses concise (1-2 sentences). Here is the conversation so far:\n---\n${chatHistory.map(m => `${m.role === 'user' ? 'User' : 'Assistant'}: ${m.parts[0].text}`).join('\n')}\n--- \nNow, provide the assistant's next response.`;
+                
+                const botResponse = await callGeminiAPI(prompt, false);
+                addChatMessage(botResponse, 'bot');
+                chatHistory.push({ role: "model", parts: [{ text: botResponse }] });
+                
+                sendChatBtn.disabled = false;
+                sendChatBtn.innerHTML = `<i data-lucide="send"></i>`;
+                lucide.createIcons();
+            };
+            
+            sendChatBtn.addEventListener('click', handleSendChat);
+            chatInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleSendChat(); });
+
+            // --- Scroll Animation ---
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('visible'); });
+            }, { threshold: 0.1 });
+            document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+            
+            // --- Mobile Menu ---
+            const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenuBtn.addEventListener('click', () => mobileMenu.classList.toggle('hidden'));
+        });
+    </script>
+</body>
+</html>
+
