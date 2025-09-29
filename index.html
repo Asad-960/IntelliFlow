@@ -145,10 +145,73 @@
             height: 120%;
             background-size: cover;
             background-position: center;
-            transform: translateY(0);
-            transition: transform 0.1s ease-out;
-            will-change: transform;
+                transform: translateY(0) scale(1.1);
+                transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                will-change: transform;
+                filter: blur(2px) brightness(0.7);
+                opacity: 0.7;
         }
+
+            /* Enhanced nav link animation with glow effect */
+            .nav-animate {
+                display: inline-flex;
+                position: relative;
+                padding: 0.5rem;
+                overflow: hidden;
+                transition: all 0.3s ease;
+                text-align: center;
+                justify-content: center;
+                min-width: max-content;
+            }
+            .nav-animate::before {
+                content: '';
+                position: absolute;
+                bottom: 0;
+                left: 50%;
+                width: 0;
+                height: 2px;
+                background: linear-gradient(90deg, 
+                    rgba(192, 132, 252, 0),
+                    rgba(192, 132, 252, 1) 50%,
+                    rgba(192, 132, 252, 0)
+                );
+                transform: translateX(-50%);
+                transition: width 0.3s ease;
+            }
+            .nav-animate:hover::before {
+                width: 100%;
+            }
+            .nav-animate span {
+                display: block;
+                transform: translateY(0);
+                opacity: 1;
+                transition: all 0.3s ease;
+            }
+            .nav-animate::after {
+                content: attr(data-hover);
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                height: 100%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: #c084fc;
+                font-weight: 600;
+                transform: translateY(100%);
+                opacity: 0;
+                transition: all 0.3s ease;
+                text-shadow: 0 0 10px rgba(192, 132, 252, 0.5);
+            }
+            .nav-animate:hover span {
+                transform: translateY(-100%);
+                opacity: 0;
+            }
+            .nav-animate:hover::after {
+                transform: translateY(0);
+                opacity: 1;
+            }
         
         /* Custom scrollbar */
         ::-webkit-scrollbar {
@@ -201,9 +264,9 @@
         <div class="container mx-auto px-6 py-4 flex justify-between items-center">
             <a href="#" class="text-2xl font-bold text-white">Intelli<span class="text-purple-400">Flow</span></a>
             <nav class="hidden md:flex items-center space-x-8">
-                <a href="#about" class="text-gray-300 hover:text-purple-400 transition-colors">About Us</a>
-                <a href="#how-it-works" class="text-gray-300 hover:text-purple-400 transition-colors">How It Works</a>
-                <a href="#contact" class="text-gray-300 hover:text-purple-400 transition-colors">Contact</a>
+                <a href="#about" class="text-gray-300 hover:text-purple-400 transition-colors nav-animate" data-hover="About Us"><span>About Us</span></a>
+                <a href="#how-it-works" class="text-gray-300 hover:text-purple-400 transition-colors nav-animate" data-hover="How It Works"><span>How It Works</span></a>
+                <a href="#contact" class="text-gray-300 hover:text-purple-400 transition-colors nav-animate" data-hover="Contact"><span>Contact</span></a>
             </nav>
             <a href="#home" class="hidden md:inline-block bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2 px-5 rounded-lg transition-transform hover:scale-105">Get Started</a>
             <button id="mobile-menu-btn" class="md:hidden text-white">
@@ -443,44 +506,39 @@
             lucide.createIcons();
 
             // --- Gemini API Logic ---
-            const callGeminiAPI = async (prompt, withRetry = true, delay = 1000) => {
-                const apiKey = ""; // API Key is provided by the execution environment
-                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
-
-                const payload = {
-                    contents: [{ parts: [{ text: prompt }] }],
-                };
-
-                try {
-                    const response = await fetch(apiUrl, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(payload)
-                    });
-
-                    if (!response.ok) {
-                        if (response.status === 429 && withRetry) { // Throttling
-                            console.warn(`Throttled. Retrying in ${delay / 1000}s...`);
-                            await new Promise(resolve => setTimeout(resolve, delay));
-                            return callGeminiAPI(prompt, true, delay * 2); // Exponential backoff
+                // --- Gemini API Logic (Vercel serverless) ---
+                const callGeminiAPI = async (prompt, withRetry = true, delay = 1000) => {
+                    const apiUrl = '/api/gemini'; // Use Vercel serverless function
+                    const payload = {
+                        contents: [{ parts: [{ text: prompt }] }],
+                    };
+                    try {
+                        const response = await fetch(apiUrl, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(payload)
+                        });
+                        if (!response.ok) {
+                            if (response.status === 429 && withRetry) {
+                                console.warn(`Throttled. Retrying in ${delay / 1000}s...`);
+                                await new Promise(resolve => setTimeout(resolve, delay));
+                                return callGeminiAPI(prompt, true, delay * 2);
+                            }
+                            throw new Error(`API call failed with status: ${response.status}`);
                         }
-                        throw new Error(`API call failed with status: ${response.status}`);
+                        const result = await response.json();
+                        const candidate = result.candidates?.[0];
+                        if (candidate && candidate.content?.parts?.[0]?.text) {
+                            return candidate.content.parts[0].text;
+                        } else {
+                            console.error("Unexpected API response structure:", result);
+                            return "Sorry, I couldn't generate a response. The AI model returned an unexpected result.";
+                        }
+                    } catch (error) {
+                        console.error("Error calling Gemini API:", error);
+                        return "An error occurred while contacting the AI. Please check the console for details.";
                     }
-
-                    const result = await response.json();
-                    const candidate = result.candidates?.[0];
-
-                    if (candidate && candidate.content?.parts?.[0]?.text) {
-                        return candidate.content.parts[0].text;
-                    } else {
-                        console.error("Unexpected API response structure:", result);
-                        return "Sorry, I couldn't generate a response. The AI model returned an unexpected result.";
-                    }
-                } catch (error) {
-                    console.error("Error calling Gemini API:", error);
-                    return "An error occurred while contacting the AI. Please check the console for details.";
-                }
-            };
+                };
             
             // --- Data for Sectors ---
             const sectors = [
@@ -696,14 +754,21 @@
             document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
             
             // --- Parallax Effect ---
-            const parallaxElements = document.querySelectorAll('.parallax-bg');
-            window.addEventListener('scroll', () => {
-                parallaxElements.forEach(el => {
-                    const scrolled = window.pageYOffset;
-                    const rate = scrolled * 0.3; // Adjust speed
-                    el.style.transform = `translateY(${rate}px)`;
+                // More effective parallax effect
+                const parallaxElements = document.querySelectorAll('.parallax-bg');
+                window.addEventListener('scroll', () => {
+                    const winHeight = window.innerHeight;
+                    const scrollY = window.scrollY;
+                    parallaxElements.forEach(el => {
+                        const parent = el.parentElement;
+                        const rect = parent.getBoundingClientRect();
+                        // Calculate parallax based on section position
+                        const offset = rect.top + scrollY;
+                        const speed = 0.5 + Math.random() * 0.2; // Slight random speed for depth
+                        const parallax = (scrollY - offset + winHeight/2) * speed;
+                        el.style.transform = `translateY(${parallax}px) scale(1.1)`;
+                    });
                 });
-            });
             
             // --- Particles.js Configuration ---
             particlesJS('particles-js', {
