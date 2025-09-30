@@ -585,29 +585,21 @@
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(payload)
                     });
-                    let result;
-                    try {
-                        result = await response.json();
-                    } catch (jsonErr) {
-                        throw new Error('Failed to parse response as JSON.');
-                    }
                     if (!response.ok) {
-                        let errorMsg = result?.error || `API call failed with status: ${response.status}`;
-                        // Show error in UI
-                        alert('Gemini API Error: ' + errorMsg);
-                        throw new Error(errorMsg);
+                        if (response.status === 429 && withRetry) {
+                            await new Promise(resolve => setTimeout(resolve, delay));
+                            return callGeminiAPI(prompt, true, delay * 2);
+                        }
+                        throw new Error(`API call failed with status: ${response.status}`);
                     }
+                    const result = await response.json();
                     const candidate = result.candidates?.[0];
                     if (candidate && candidate.content?.parts?.[0]?.text) {
                         return candidate.content.parts[0].text;
                     } else {
-                        alert("Gemini API returned unexpected result. See console for details.");
-                        console.error("Unexpected API response structure:", result);
                         return "Sorry, I couldn't generate a response. The AI model returned an unexpected result.";
                     }
                 } catch (error) {
-                    alert("Error calling Gemini API: " + error.message);
-                    console.error("Error calling Gemini API:", error);
                     return "An error occurred while contacting the AI. Please check the console for details.";
                 }
             };
