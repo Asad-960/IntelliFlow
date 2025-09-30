@@ -28,14 +28,37 @@
             pointer-events: none; /* Allows clicking through */
         }
         #particles-js {
-            position: fixed; /* Changed to fixed */
+            position: fixed;
             width: 100%;
             height: 100%;
-            background: linear-gradient(to bottom, rgba(13, 13, 26, 0.85), rgba(13, 13, 26, 0.95)),
-                        radial-gradient(circle at 10% 20%, rgba(138, 43, 226, 0.2), transparent 40%),
-                        radial-gradient(circle at 80% 90%, rgba(25, 25, 112, 0.3), transparent 40%),
-                        radial-gradient(circle at 50% 50%, rgba(20, 20, 40, 0.2), transparent 60%);
+            background: linear-gradient(to bottom, rgba(13, 13, 26, 0.9), rgba(13, 13, 26, 0.95)),
+                        radial-gradient(circle at 10% 20%, rgba(138, 43, 226, 0.15), transparent 40%),
+                        radial-gradient(circle at 80% 90%, rgba(25, 25, 112, 0.2), transparent 40%),
+                        radial-gradient(circle at 50% 50%, rgba(20, 20, 40, 0.15), transparent 60%);
             animation: move-glow 20s ease-in-out infinite alternate;
+            filter: blur(0px); /* Initial state */
+            transition: filter 0.3s ease;
+        }
+
+        /* Glowing effect when interacting with particles */
+        #particles-js:hover {
+            filter: blur(1px);
+        }
+
+        /* Neural synapse effect on particle connections */
+        .particles-js-canvas-el {
+            mix-blend-mode: screen;
+        }
+
+        /* Add a subtle pulse animation to particles */
+        @keyframes particle-pulse {
+            0%, 100% { transform: scale(1); opacity: 0.6; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+
+        /* Custom cursor for particle interaction */
+        #particles-js {
+            cursor: crosshair;
         }
         
         /* Additional gradient overlays for depth */
@@ -252,6 +275,54 @@
             color: #9333ea; /* purple-600 */
             font-weight: bold;
         }
+
+        /* Animated arrow styles */
+@keyframes arrow-move {
+  0% { opacity: 0; transform: translateY(0) scale(0.8); }
+  30% { opacity: 1; transform: translateY(0) scale(1); }
+  70% { opacity: 1; transform: translateY(10px) scale(1.1); }
+  100% { opacity: 0; transform: translateY(20px) scale(0.8); }
+}
+
+.howitworks-arrow {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
+  pointer-events: none;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+}
+
+.howitworks-step {
+  transition: box-shadow 0.5s, filter 0.5s, opacity 0.5s, transform 0.5s;
+}
+
+.howitworks-step.glow {
+  box-shadow: 0 0 32px 8px #a855f7, 0 0 8px 2px #00fff7;
+  filter: brightness(1.2) drop-shadow(0 0 8px #9333ea);
+}
+
+.howitworks-step.fade {
+  opacity: 0.3;
+  filter: blur(1px);
+}
+
+.howitworks-step.visible {
+  opacity: 1;
+  filter: none;
+}
+
+@media (max-width: 768px) {
+  .howitworks-arrow {
+    width: 32px;
+    height: 32px;
+  }
+}
     </style>
 </head>
 <body class="overflow-x-hidden">
@@ -268,7 +339,6 @@
                 <a href="#how-it-works" class="text-gray-300 hover:text-purple-400 transition-colors nav-animate" data-hover="How It Works"><span>How It Works</span></a>
                 <a href="#contact" class="text-gray-300 hover:text-purple-400 transition-colors nav-animate" data-hover="Contact"><span>Contact</span></a>
             </nav>
-            <a href="#home" class="hidden md:inline-block bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2 px-5 rounded-lg transition-transform hover:scale-105">Get Started</a>
             <button id="mobile-menu-btn" class="md:hidden text-white">
                 <i data-lucide="menu"></i>
             </button>
@@ -278,7 +348,6 @@
              <a href="#about" class="block py-2 text-gray-300 hover:text-purple-400">About Us</a>
              <a href="#how-it-works" class="block py-2 text-gray-300 hover:text-purple-400">How It Works</a>
              <a href="#contact" class="block py-2 text-gray-300 hover:text-purple-400">Contact</a>
-             <a href="#home" class="block mt-2 bg-purple-600 hover:bg-purple-700 text-white text-center font-semibold py-2 px-5 rounded-lg">Get Started</a>
         </div>
     </header>
 
@@ -394,42 +463,40 @@
 
         <!-- How It Works Section -->
         <section id="how-it-works" class="py-20 bg-black/20 section-overlay">
-            <div class="container mx-auto px-6 text-center">
-                <h2 class="text-3xl md:text-4xl font-bold text-white reveal">Our Advisory Process</h2>
-                <p class="mt-4 max-w-2xl mx-auto text-gray-300 reveal" style="transition-delay: 200ms;">A clear, structured approach to workflow optimization.</p>
-                <div class="mt-12 grid md:grid-cols-3 gap-8 relative">
-                    <!-- Dashed line connecting the steps -->
-                    <div class="hidden md:block absolute top-1/2 left-0 w-full h-px -translate-y-12 bg-repeat-x" style="background-image: linear-gradient(to right, #4a044e 50%, transparent 50%); background-size: 20px 1px;"></div>
-                    
-                    <div class="relative reveal">
-                        <div class="bg-gray-800/50 p-6 rounded-lg border border-white/10 text-center">
-                            <div class="mb-4 inline-block bg-purple-600 text-white p-4 rounded-full">
-                                <i data-lucide="database-zap"></i>
-                            </div>
-                            <h3 class="text-xl font-bold text-white">1. Submit Details</h3>
-                            <p class="mt-2 text-gray-400">You provide information about your workflow through our secure form, document upload, or chat interface.</p>
-                        </div>
-                    </div>
-                    <div class="relative reveal" style="transition-delay: 200ms;">
-                        <div class="bg-gray-800/50 p-6 rounded-lg border border-white/10 text-center">
-                            <div class="mb-4 inline-block bg-purple-600 text-white p-4 rounded-full">
-                                <i data-lucide="brain-circuit"></i>
-                            </div>
-                            <h3 class="text-xl font-bold text-white">2. AI-Powered Analysis</h3>
-                            <p class="mt-2 text-gray-400">Our system analyzes your submitted data to identify key areas for automation and augmentation.</p>
-                        </div>
-                    </div>
-                    <div class="relative reveal" style="transition-delay: 400ms;">
-                        <div class="bg-gray-800/50 p-6 rounded-lg border border-white/10 text-center">
-                            <div class="mb-4 inline-block bg-purple-600 text-white p-4 rounded-full">
-                                <i data-lucide="clipboard-list"></i>
-                            </div>
-                            <h3 class="text-xl font-bold text-white">3. Get Your Quote</h3>
-                            <p class="mt-2 text-gray-400">Our expert team reviews the AI suggestions and provides you with a detailed advisory quote.</p>
-                        </div>
-                    </div>
+          <div class="container mx-auto px-6 text-center">
+            <h2 class="text-3xl md:text-4xl font-bold text-white reveal">Our Advisory Process</h2>
+            <p class="mt-4 max-w-2xl mx-auto text-gray-300 reveal" style="transition-delay: 200ms;">A clear, structured approach to workflow optimization.</p>
+            <div class="mt-12 grid md:grid-cols-3 gap-8 relative" id="howitworks-steps">
+              <!-- Steps -->
+              <div class="relative howitworks-step" id="step-1">
+                <div class="bg-gray-800/50 p-6 rounded-lg border border-white/10 text-center">
+                  <div class="mb-4 inline-block bg-purple-600 text-white p-4 rounded-full">
+                    <i data-lucide="database-zap"></i>
+                  </div>
+                  <h3 class="text-xl font-bold text-white">1. Submit Details</h3>
+                  <p class="mt-2 text-gray-400">You provide information about your workflow through our secure form, document upload, or chat interface.</p>
                 </div>
+              </div>
+              <div class="relative howitworks-step" id="step-2">
+                <div class="bg-gray-800/50 p-6 rounded-lg border border-white/10 text-center">
+                  <div class="mb-4 inline-block bg-purple-600 text-white p-4 rounded-full">
+                    <i data-lucide="brain-circuit"></i>
+                  </div>
+                  <h3 class="text-xl font-bold text-white">2. AI-Powered Analysis</h3>
+                  <p class="mt-2 text-gray-400">Our system analyzes your submitted data to identify key areas for automation and augmentation.</p>
+                </div>
+              </div>
+              <div class="relative howitworks-step" id="step-3">
+                <div class="bg-gray-800/50 p-6 rounded-lg border border-white/10 text-center">
+                  <div class="mb-4 inline-block bg-purple-600 text-white p-4 rounded-full">
+                    <i data-lucide="clipboard-list"></i>
+                  </div>
+                  <h3 class="text-xl font-bold text-white">3. Get Your Quote</h3>
+                  <p class="mt-2 text-gray-400">Our expert team reviews the AI suggestions and provides you with a detailed advisory quote.</p>
+                </div>
+              </div>
             </div>
+          </div>
         </section>
         
         <!-- Contact Us Section -->
@@ -506,39 +573,44 @@
             lucide.createIcons();
 
             // --- Gemini API Logic ---
-                // --- Gemini API Logic (Vercel serverless) ---
-                const callGeminiAPI = async (prompt, withRetry = true, delay = 1000) => {
-                    const apiUrl = '/api/gemini'; // Use Vercel serverless function
-                    const payload = {
-                        contents: [{ parts: [{ text: prompt }] }],
-                    };
-                    try {
-                        const response = await fetch(apiUrl, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify(payload)
-                        });
-                        if (!response.ok) {
-                            if (response.status === 429 && withRetry) {
-                                console.warn(`Throttled. Retrying in ${delay / 1000}s...`);
-                                await new Promise(resolve => setTimeout(resolve, delay));
-                                return callGeminiAPI(prompt, true, delay * 2);
-                            }
-                            throw new Error(`API call failed with status: ${response.status}`);
-                        }
-                        const result = await response.json();
-                        const candidate = result.candidates?.[0];
-                        if (candidate && candidate.content?.parts?.[0]?.text) {
-                            return candidate.content.parts[0].text;
-                        } else {
-                            console.error("Unexpected API response structure:", result);
-                            return "Sorry, I couldn't generate a response. The AI model returned an unexpected result.";
-                        }
-                    } catch (error) {
-                        console.error("Error calling Gemini API:", error);
-                        return "An error occurred while contacting the AI. Please check the console for details.";
-                    }
+            // --- Gemini API Logic (Vercel serverless) ---
+            const callGeminiAPI = async (prompt, withRetry = true, delay = 1000) => {
+                const apiUrl = '/api/gemini';
+                const payload = {
+                    contents: [{ parts: [{ text: prompt }] }]
                 };
+                try {
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    let result;
+                    try {
+                        result = await response.json();
+                    } catch (jsonErr) {
+                        throw new Error('Failed to parse response as JSON.');
+                    }
+                    if (!response.ok) {
+                        let errorMsg = result?.error || `API call failed with status: ${response.status}`;
+                        // Show error in UI
+                        alert('Gemini API Error: ' + errorMsg);
+                        throw new Error(errorMsg);
+                    }
+                    const candidate = result.candidates?.[0];
+                    if (candidate && candidate.content?.parts?.[0]?.text) {
+                        return candidate.content.parts[0].text;
+                    } else {
+                        alert("Gemini API returned unexpected result. See console for details.");
+                        console.error("Unexpected API response structure:", result);
+                        return "Sorry, I couldn't generate a response. The AI model returned an unexpected result.";
+                    }
+                } catch (error) {
+                    alert("Error calling Gemini API: " + error.message);
+                    console.error("Error calling Gemini API:", error);
+                    return "An error occurred while contacting the AI. Please check the console for details.";
+                }
+            };
             
             // --- Data for Sectors ---
             const sectors = [
@@ -626,56 +698,66 @@
             const closeSuggestionModalBtn = document.getElementById('close-suggestion-modal');
             const submitBtns = document.querySelectorAll('.submit-btn');
 
+            // --- Markdown to HTML rendering ---
+function renderMarkdown(md) {
+  // Simple Markdown parser for headings and bullet points
+  // Headings: **Title** => <h3><strong>Title</strong></h3>
+  md = md.replace(/\*\*(.*?)\*\*/g, '<h3 class="mt-4 mb-2 text-lg font-bold text-purple-400">$1</h3>');
+  // Bullets: - item => <li>item</li>
+  md = md.replace(/^- (.*)$/gm, '<li>$1</li>');
+  // Wrap consecutive <li> in <ul>
+  md = md.replace(/(<li>.*?<\/li>\s*)+/gs, match => `<ul class="list-disc ml-6">${match}</ul>`);
+  // Paragraphs: lines not in <h3> or <li>
+  md = md.replace(/([^<][^\n]+)(?=\n|$)/g, (m) => {
+    if (m.trim() && !m.startsWith('<') && !m.match(/^\s*$/)) {
+      return `<p class="mb-2">${m.trim()}</p>`;
+    }
+    return m;
+  });
+  return md;
+}
+
             const showSuggestionModal = (loading = true) => {
-                if (loading) {
-                    modalLoadingState.classList.remove('hidden');
-                    modalResultState.classList.add('hidden');
-                } else {
-                    modalLoadingState.classList.add('hidden');
-                    modalResultState.classList.remove('hidden');
-                }
-                suggestionModal.classList.remove('hidden');
-                setTimeout(() => suggestionModal.querySelector('div').classList.remove('scale-90', 'opacity-0'), 10);
+              if (loading) {
+                modalLoadingState.classList.remove('hidden');
+                modalResultState.classList.add('hidden');
+              } else {
+                modalLoadingState.classList.add('hidden');
+                modalResultState.classList.remove('hidden');
+              }
+              suggestionModal.classList.remove('hidden');
+              setTimeout(() => suggestionModal.querySelector('div').classList.remove('scale-90', 'opacity-0'), 10);
             };
             const hideSuggestionModal = () => {
-                suggestionModal.querySelector('div').classList.add('scale-90', 'opacity-0');
-                setTimeout(() => suggestionModal.classList.add('hidden'), 300);
+              suggestionModal.querySelector('div').classList.add('scale-90', 'opacity-0');
+              setTimeout(() => suggestionModal.classList.add('hidden'), 300);
             };
 
             submitBtns.forEach(btn => {
-                if (document.querySelector('#contact form').contains(btn)) return; // Exclude contact form button
+              if (document.querySelector('#contact form').contains(btn)) return; // Exclude contact form button
 
-                btn.addEventListener('click', async () => {
-                    showSuggestionModal(true);
-                    let userInput = '';
-                    const sector = selectedSectorTitle.textContent;
-                    const activeTab = document.querySelector('.tab-btn.tab-active').dataset.tab;
+              btn.addEventListener('click', async () => {
+                showSuggestionModal(true);
+                let userInput = '';
+                const sector = selectedSectorTitle.textContent;
+                const activeTab = document.querySelector('.tab-btn.tab-active').dataset.tab;
 
-                    if (activeTab === 'form') {
-                        const company = document.querySelector('#form-content input[type="text"]').value;
-                        const challenges = document.querySelector('#form-content textarea').value;
-                        userInput = `Company: ${company || 'Not provided'}\nChallenges: ${challenges || 'Not specified'}`;
-                    } else if (activeTab === 'upload') {
-                        const fileNames = Array.from(fileUpload.files).map(f => f.name).join(', ');
-                        userInput = `The user uploaded the following documents for analysis: ${fileNames}. The documents likely describe their standard operating procedures. Assume they face common challenges in their industry.`;
-                    } else if (activeTab === 'chat') {
-                        const messages = chatHistory.map(m => `${m.role === 'user' ? 'User' : 'Assistant'}: ${m.parts[0].text}`).join('\n');
-                        userInput = `Here is a conversation with a user:\n${messages}`;
-                    }
-                    
-                    const prompt = `You are an expert workflow automation consultant. A potential client from the "${sector}" industry has provided the following information:\n---\n${userInput}\n---\nBased ONLY on this information, analyze their situation and suggest 3-5 specific, actionable parts of their workflow that could be automated or augmented with AI. For each suggestion:\n1. Give it a clear, bolded title.\n2. Provide a brief, one-sentence explanation of the problem it solves.\n3. Use bullet points starting with a hyphen (-) to list 2-3 potential benefits (e.g., "Reduces manual data entry", "Improves customer response time").\nFormat your response in Markdown. Do not add any introductory or concluding paragraphs.`;
-                    
-                    const suggestions = await callGeminiAPI(prompt);
-                    const formattedSuggestions = suggestions
-                        .replace(/\*\*(.*?)\*\*/g, '<h3><strong>$1</strong></h3>')
-                        .replace(/(\r\n|\n|\r)/g, '<br>')
-                        .replace(/<br>\s*-\s/g, '<ul><li>')
-                        .replace(/(<\/li>)<br>\s*-\s/g, '</li><li>')
-                        .replace(/(<li>.*?)<\/li>/g, '$1</li></ul>');
-
-                    suggestionContent.innerHTML = formattedSuggestions;
-                    showSuggestionModal(false);
-                });
+                if (activeTab === 'form') {
+                  const company = document.querySelector('#form-content input[type="text"]').value;
+                  const challenges = document.querySelector('#form-content textarea').value;
+                  userInput = `Company: ${company || 'Not provided'}\nChallenges: ${challenges || 'Not specified'}`;
+                } else if (activeTab === 'upload') {
+                  const fileNames = Array.from(fileUpload.files).map(f => f.name).join(', ');
+                  userInput = `The user uploaded the following documents for analysis: ${fileNames}. The documents likely describe their standard operating procedures. Assume they face common challenges in their industry.`;
+                } else if (activeTab === 'chat') {
+                  const messages = chatHistory.map(m => `${m.role === 'user' ? 'User' : 'Assistant'}: ${m.parts[0].text}`).join('\n');
+                  userInput = `Here is a conversation with a user:\n${messages}`;
+                }
+                const prompt = `You are an expert workflow automation consultant. A potential client from the "${sector}" industry has provided the following information:\n---\n${userInput}\n---\nBased ONLY on this information, analyze their situation and suggest 3-5 specific, actionable parts of their workflow that could be automated or augmented with AI. For each suggestion:\n1. Give it a clear, bolded title.\n2. Provide a brief, one-sentence explanation of the problem it solves.\n3. Use bullet points starting with a hyphen (-) to list 2-3 potential benefits (e.g., "Reduces manual data entry", "Improves customer response time").\nFormat your response in Markdown. Do not add any introductory or concluding paragraphs.`;
+                const suggestions = await callGeminiAPI(prompt);
+                suggestionContent.innerHTML = renderMarkdown(suggestions);
+                showSuggestionModal(false);
+              });
             });
             
             closeSuggestionModalBtn.addEventListener('click', hideSuggestionModal);
@@ -771,58 +853,128 @@
                 });
             
             // --- Particles.js Configuration ---
+            // Futuristic neural network-style particles.js config
             particlesJS('particles-js', {
                 particles: {
-                    number: { value: 100, density: { enable: true, value_area: 1500 } },
-                    color: { value: '#9333ea' },
-                    shape: { type: 'circle' },
+                    number: {
+                        value: 120, // More particles for denser network
+                        density: { enable: true, value_area: 900 }
+                    },
+                    color: { value: ["#00fff7", "#9333ea", "#a855f7", "#39ff14"] }, // Neon/AI colors
+                    shape: { type: "circle" },
                     opacity: {
-                        value: 0.3,
+                        value: 0.7,
                         random: true,
-                        animation: { enable: true, speed: 0.5, opacity_min: 0.1, sync: false }
+                        anim: { enable: true, speed: 1, opacity_min: 0.2, sync: false }
                     },
                     size: {
-                        value: 2,
+                        value: 3.5,
                         random: true,
-                        animation: { enable: true, speed: 1, size_min: 0.1, sync: false }
+                        anim: { enable: true, speed: 2, size_min: 0.5, sync: false }
                     },
                     line_linked: {
                         enable: true,
-                        distance: 200,
-                        color: '#a855f7',
-                        opacity: 0.2,
-                        width: 1
+                        distance: 140,
+                        color: "#00fff7",
+                        opacity: 0.35,
+                        width: 2
                     },
                     move: {
                         enable: true,
-                        speed: 0.8,
-                        direction: 'none',
+                        speed: 2.2,
+                        direction: "none",
                         random: true,
                         straight: false,
-                        out_mode: 'bounce',
-                        bounce: true,
-                        attract: { enable: true, rotateX: 600, rotateY: 1200 }
+                        out_mode: "out",
+                        bounce: false,
+                        attract: { enable: true, rotateX: 1200, rotateY: 1200 }
                     }
                 },
                 interactivity: {
-                    detect_on: 'canvas',
+                    detect_on: "canvas",
                     events: {
-                        onhover: { enable: true, mode: 'grab' },
-                        onclick: { enable: true, mode: 'push' },
+                        onhover: { enable: true, mode: "grab" },
+                        onclick: { enable: true, mode: "push" },
                         resize: true
                     },
                     modes: {
-                        grab: { distance: 140, line_linked: { opacity: 0.8 } },
-                        push: { particles_nb: 4 }
+                        grab: { distance: 180, line_linked: { opacity: 0.9 } },
+                        push: { particles_nb: 6 }
                     }
                 },
-                retina_detect: true
+                retina_detect: true,
+                config_demo: {
+                    hide_card: true,
+                    background_color: "#0d0d1a",
+                    background_position: "50% 50%",
+                    background_repeat: "no-repeat",
+                    background_size: "cover"
+                }
             });
             
+            // Subtle color pulse effect for neon lines
+            setInterval(() => {
+                const canvas = document.querySelector('.particles-js-canvas-el');
+                if (canvas) {
+                    canvas.style.filter = `drop-shadow(0 0 16px #00fff7) drop-shadow(0 0 8px #9333ea)`;
+                }
+            }, 100);
+
             // --- Mobile Menu ---
             const mobileMenuBtn = document.getElementById('mobile-menu-btn');
             const mobileMenu = document.getElementById('mobile-menu');
             mobileMenuBtn.addEventListener('click', () => mobileMenu.classList.toggle('hidden'));
+
+            // --- How It Works Animated Sequence ---
+            // Timing settings (ms)
+            const howitworksTiming = {
+              step1: 800,
+              step2: 900,
+              step3: 900
+            };
+            function runHowItWorksAnimationOnce() {
+              const s1 = document.getElementById('step-1');
+              const s2 = document.getElementById('step-2');
+              const s3 = document.getElementById('step-3');
+              [s1, s2, s3].forEach(el => {
+                el.classList.remove('glow', 'fade', 'visible');
+                el.classList.add('fade');
+              });
+              setTimeout(() => {
+                s1.classList.remove('fade');
+                s1.classList.add('glow', 'visible');
+                setTimeout(() => {
+                  s1.classList.remove('glow');
+                  s1.classList.add('fade');
+                  s2.classList.remove('fade');
+                  s2.classList.add('glow', 'visible');
+                  setTimeout(() => {
+                    s2.classList.remove('glow');
+                    s2.classList.add('fade');
+                    s3.classList.remove('fade');
+                    s3.classList.add('glow', 'visible');
+                    setTimeout(() => {
+                      s3.classList.remove('glow');
+                    }, howitworksTiming.step3);
+                  }, howitworksTiming.step2);
+                }, howitworksTiming.step1);
+              }, 200);
+            }
+            let howitworksStarted = false;
+            const howitworksSection = document.getElementById('howitworks-steps');
+            const howitworksObserver = new IntersectionObserver((entries) => {
+              entries.forEach(entry => {
+                if (entry.isIntersecting && !howitworksStarted) {
+                  howitworksStarted = true;
+                  runHowItWorksAnimationOnce();
+                }
+              });
+            }, { threshold: 0.3 });
+            howitworksObserver.observe(howitworksSection);
+            // ---
+            // To adjust timing, change values in howitworksTiming object above.
+            // To change arrow style, edit SVGs in .howitworks-arrow divs.
+            // To change animation, edit CSS keyframes and .glow/.fade classes.
         });
     </script>
 </body>
